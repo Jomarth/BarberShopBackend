@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import Usuario from "../models/usuarioSchema";
+import mongoose from 'mongoose';
 
 
 const getUsuario = async (req: Request, res: Response) => {
@@ -15,13 +16,15 @@ const getUsuario = async (req: Request, res: Response) => {
 
 const createUsuario = async (req: Request, res: Response) => {
     try{
-        const body = req.body;
-        const existingUsuario = await Usuario.findOne({ body });
+        const { auth0Id } = req.body;
+        const existingUsuario = await Usuario.findOne({ auth0Id });
 
         if (existingUsuario) {
             return res.status(200).json(existingUsuario);
         }
         const newUsuario = new Usuario(req.body);
+        //restaurante.user = new mongoose.Types.ObjectId(req.userId);
+        newUsuario.tarjeta = new mongoose.Types.ObjectId(req.tarjetaId);
         await newUsuario.save();
 
         res.status(201).json(newUsuario.toObject());
